@@ -11,8 +11,16 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "ajv": "^8.20.0",
+    "ajv-keywords": "^5.1.0",
+    "docx": "^9.6.1",
+    "file-saver": "^2.0.5",
+    "html-docx-js": "^0.3.1",
+    "lucide-react": "^1.14.0",
+    "mammoth": "^1.12.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-dropzone": "^15.0.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -40,5 +48,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.13",
+    "tailwindcss": "^3.4.19"
   }
 }
