@@ -1,13 +1,27 @@
-import { Upload, Eye, Download } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  Download,
+  Eye,
+  SlidersHorizontal,
+  Upload,
+} from "lucide-react";
 
 interface Props {
   onPreview: () => void;
   onExport: () => void;
   onAutoFix: () => void;
   onUpload: (file: File) => void;
+  onOpenFormatting: () => void;
   previewMode: boolean;
   hasDocument: boolean;
   autoFixing?: boolean;
+  /** When the slide-over formatting panel is open, hide the nav Format tooltip. */
+  formattingPanelOpen?: boolean;
 }
 
 const Navbar = ({
@@ -15,19 +29,148 @@ const Navbar = ({
   onExport,
   onAutoFix,
   onUpload,
+  onOpenFormatting,
   previewMode,
   hasDocument,
   autoFixing = false,
+  formattingPanelOpen = false,
 }: Props) => {
-  return (
-    <div className="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
-      <h1 className="text-2xl font-bold text-indigo-600">DocPolishAI</h1>
+  const formatBtnRef =
+    useRef<HTMLButtonElement>(null);
+  const [formatTipPos, setFormatTipPos] =
+    useState<{
+      top: number;
+      left: number;
+    } | null>(null);
 
-      <div className="flex gap-3">
+  const updateFormatTooltip =
+    useCallback(() => {
+      const el =
+        formatBtnRef.current;
+
+      if (!el) {
+        return;
+      }
+
+      const r =
+        el.getBoundingClientRect();
+
+      setFormatTipPos({
+        top: r.bottom + 8,
+        left:
+          r.left +
+          r.width / 2,
+      });
+    }, []);
+
+  const hideFormatTooltip =
+    useCallback(() => {
+      setFormatTipPos(null);
+    }, []);
+
+  useEffect(() => {
+    if (!formatTipPos) {
+      return;
+    }
+
+    const sync =
+      updateFormatTooltip;
+
+    window.addEventListener(
+      "scroll",
+      sync,
+      true
+    );
+    window.addEventListener(
+      "resize",
+      sync
+    );
+
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        sync,
+        true
+      );
+      window.removeEventListener(
+        "resize",
+        sync
+      );
+    };
+  }, [
+    formatTipPos,
+    updateFormatTooltip,
+  ]);
+
+  useEffect(() => {
+    if (formattingPanelOpen) {
+      setFormatTipPos(null);
+    }
+  }, [formattingPanelOpen]);
+
+  return (
+    <div className="flex items-center justify-between gap-2 border-b bg-white px-3 py-2.5 shadow-sm sm:px-6 sm:py-4">
+      <h1 className="shrink-0 text-lg font-bold tracking-tight text-indigo-600 sm:text-xl lg:text-2xl">
+        DocPolishAI
+      </h1>
+
+      <div className="flex min-w-0 flex-1 justify-end">
+        <div className="flex max-w-full flex-nowrap items-center justify-end gap-1.5 overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch] sm:gap-2 sm:pb-0 lg:max-w-none lg:overflow-visible lg:pb-0">
+        <button
+          ref={formatBtnRef}
+          type="button"
+          onClick={onOpenFormatting}
+          aria-describedby={
+            formatTipPos
+              ? "formatting-tooltip"
+              : undefined
+          }
+          aria-label="Open formatting rules"
+          className="flex shrink-0 items-center justify-center rounded-lg border border-indigo-200 bg-white p-2 text-xs font-medium text-indigo-800 shadow-sm hover:bg-indigo-50 lg:hidden"
+          onMouseEnter={
+            formattingPanelOpen
+              ? undefined
+              : updateFormatTooltip
+          }
+          onMouseLeave={
+            formattingPanelOpen
+              ? undefined
+              : hideFormatTooltip
+          }
+          onFocus={
+            formattingPanelOpen
+              ? undefined
+              : updateFormatTooltip
+          }
+          onBlur={
+            formattingPanelOpen
+              ? undefined
+              : hideFormatTooltip
+          }
+        >
+          <SlidersHorizontal
+            size={18}
+            className="shrink-0 text-indigo-600"
+            aria-hidden
+          />
+        </button>
+
         {/* Upload */}
-        <label className="px-4 py-2 border rounded-lg flex gap-2 items-center cursor-pointer hover:bg-gray-50">
-          <Upload size={18} />
-          Upload New
+        <label
+          aria-label="Upload new DOCX file"
+          className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium hover:bg-gray-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-base"
+        >
+          <Upload
+            size={16}
+            className="shrink-0 sm:h-[18px] sm:w-[18px]"
+            aria-hidden
+          />
+          <span className="whitespace-nowrap sm:hidden">
+            Upload
+          </span>
+          <span className="hidden whitespace-nowrap sm:inline">
+            Upload New
+          </span>
           <input
             type="file"
             accept=".docx"
@@ -56,24 +199,50 @@ const Navbar = ({
 
             {/* Preview */}
             <button
+              type="button"
               onClick={onPreview}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg flex gap-2 items-center"
+              className="flex shrink-0 items-center gap-1 rounded-lg bg-blue-600 px-2 py-1.5 text-xs text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-base"
             >
-              <Eye size={18} />
+              <Eye
+                size={16}
+                className="shrink-0 sm:h-[18px] sm:w-[18px]"
+                aria-hidden
+              />
               {previewMode ? "Edit Mode" : "Preview"}
             </button>
 
             {/* Export */}
             <button
+              type="button"
               onClick={onExport}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg flex gap-2 items-center"
+              className="flex shrink-0 items-center gap-1 rounded-lg bg-green-600 px-2 py-1.5 text-xs text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-base"
             >
-              <Download size={18} />
+              <Download
+                size={16}
+                className="shrink-0 sm:h-[18px] sm:w-[18px]"
+                aria-hidden
+              />
               Export
             </button>
           </>
         )}
+        </div>
       </div>
+
+      {formatTipPos &&
+      !formattingPanelOpen ? (
+        <div
+          id="formatting-tooltip"
+          role="tooltip"
+          className="pointer-events-none fixed z-[100] max-w-[min(90vw,16rem)] -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-center text-xs font-medium leading-snug text-white shadow-lg ring-1 ring-white/10"
+          style={{
+            top: formatTipPos.top,
+            left: formatTipPos.left,
+          }}
+        >
+          Format
+        </div>
+      ) : null}
     </div>
   );
 };

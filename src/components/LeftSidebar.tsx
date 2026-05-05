@@ -12,9 +12,16 @@ interface Props {
   blocks: DocumentBlock[];
   styles: StyleConfig;
   setStyles: React.Dispatch<React.SetStateAction<StyleConfig>>;
+  /** When true, panel title is provided by the shell (e.g. mobile drawer). */
+  embeddedInMenu?: boolean;
 }
 
-const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
+const LeftSidebar = ({
+  blocks,
+  styles,
+  setStyles,
+  embeddedInMenu = false,
+}: Props) => {
   const updateStyle = <K extends keyof StyleConfig>(
     key: K,
     value: StyleConfig[K]
@@ -51,7 +58,13 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
     <div className="space-y-6">
       {/* Formatting */}
       <div className="bg-white p-5 rounded-xl shadow-sm">
-        <h2 className="font-semibold mb-4">Formatting Rules</h2>
+        {!embeddedInMenu ? (
+          <h2 className="mb-4 font-semibold">
+            Formatting Rules
+          </h2>
+        ) : (
+          <span className="sr-only">Formatting Rules</span>
+        )}
 
         <div className="space-y-4">
           <div>

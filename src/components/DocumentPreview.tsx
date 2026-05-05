@@ -23,6 +23,7 @@ import {
   tryParseOutputTailAfterCode,
 } from "../utils/outputSectionBlocks";
 import { wordStyleLabel } from "../utils/wordStyleLabels";
+import { useMatchMedia } from "../hooks/useMatchMedia";
 import DocumentSearchBar from "./DocumentSearchBar";
 import RichParagraphField, {
   type RichParagraphFieldHandle,
@@ -40,6 +41,31 @@ import {
 
 /** Whether a {@link DocumentBlock} belongs to the editor’s active style tab. */
 type EditorTab = BlockType | "all";
+
+/** Narrow layout + real hover (e.g. resized desktop); phones skip `title` hints. */
+const SMALL_VIEWPORT_HOVER =
+  "(max-width: 1023px) and (hover: hover)";
+
+function editorTabHoverTitle(
+  tab: EditorTab
+): string {
+  switch (tab) {
+    case "all":
+      return "Show every block type in this document.";
+    case "title":
+      return "Show only title blocks.";
+    case "subtitle":
+      return "Show only subtitle blocks.";
+    case "paragraph":
+      return "Show paragraph and table blocks.";
+    case "code":
+      return "Show only code blocks.";
+    case "table":
+      return "Show table blocks.";
+    default:
+      return "";
+  }
+}
 
 const blockMatchesEditorTab = (
   block: DocumentBlock,
@@ -192,6 +218,9 @@ const DocumentPreview = ({
         RichParagraphFieldHandle
       >
     >(new Map());
+
+  const narrowHoverHints =
+    useMatchMedia(SMALL_VIEWPORT_HOVER);
 
   const handleRichCommit =
     useCallback(
@@ -1131,11 +1160,11 @@ const DocumentPreview = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm min-h-full">
+    <div className="min-h-full rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       {/* ---------------- PREVIEW MODE ---------------- */}
       {previewMode ? (
         <>
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="mb-2 text-xl font-bold sm:text-2xl lg:text-3xl">
             Final Preview
           </h1>
           <p className="text-sm text-gray-500 mb-6">
@@ -1219,12 +1248,13 @@ const DocumentPreview = ({
       ) : (
         <>
           {/* ---------------- EDITOR MODE ---------------- */}
-          <h1 className="text-3xl font-bold mb-6">Document Editor</h1>
+          <h1 className="mb-3 text-xl font-bold sm:mb-4 sm:text-2xl lg:mb-6 lg:text-3xl">
+            Document Editor
+          </h1>
 
-          {/* Tabs + Global Controls */}
-          <div className="flex justify-between items-center mb-4">
-            {/* Left Tabs */}
-            <div className="flex gap-4 flex-wrap">
+          {/* Tabs + Global Controls — mobile: full-bleed scroll row + compact actions; lg+: unchanged row */}
+          <div className="mb-3 flex flex-col gap-2 sm:mb-4 lg:mb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
+            <div className="-mx-4 flex w-full min-w-0 max-w-full touch-pan-x gap-2 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:thin] sm:-mx-6 sm:px-6 lg:mx-0 lg:w-auto lg:max-w-none lg:flex-wrap lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0">
               {(
                 styles.detectCodeBlocks === false
                   ? ([
@@ -1243,10 +1273,25 @@ const DocumentPreview = ({
               ).map((tab) => (
                 <button
                   key={tab}
+                  type="button"
+                  aria-label={
+                    tab === "all"
+                      ? "All sections"
+                      : wordStyleLabel(
+                          tab as BlockType
+                        )
+                  }
+                  title={
+                    narrowHoverHints
+                      ? editorTabHoverTitle(
+                          tab
+                        )
+                      : undefined
+                  }
                   onClick={() =>
                     setActiveTab(tab)
                   }
-                  className={`px-6 py-3 rounded-xl ${
+                  className={`shrink-0 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-medium lg:rounded-xl lg:px-6 lg:py-3 lg:text-base ${
                     activeTab === tab
                       ? "bg-indigo-600 text-white"
                       : "bg-gray-100"
@@ -1254,18 +1299,36 @@ const DocumentPreview = ({
                 >
                   {tab === "all"
                     ? "All"
-                    : wordStyleLabel(
-                        tab as BlockType
-                      )}
+                    : tab === "paragraph"
+                      ? (
+                          <>
+                            <span className="lg:hidden">
+                              Para
+                            </span>
+                            <span className="hidden lg:inline">
+                              {wordStyleLabel(
+                                "paragraph"
+                              )}
+                            </span>
+                          </>
+                        )
+                      : wordStyleLabel(
+                          tab as BlockType
+                        )}
                 </button>
               ))}
             </div>
 
-            {/* Right Controls */}
-            <div className="flex gap-3">
+            <div className="flex w-full gap-1.5 lg:w-auto lg:shrink-0 lg:gap-3">
               <button
+                type="button"
                 onClick={handleBoldAll}
-                className={`px-4 py-2 rounded-lg ${
+                title={
+                  narrowHoverHints
+                    ? "Apply bold to all text in the blocks listed for this tab."
+                    : undefined
+                }
+                className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium leading-tight lg:flex-none lg:rounded-lg lg:px-4 lg:py-2 lg:text-base lg:leading-normal ${
                   isBoldAllActive
                     ? "bg-indigo-500 text-white"
                     : "bg-indigo-100 text-indigo-700"
@@ -1275,8 +1338,14 @@ const DocumentPreview = ({
               </button>
 
               <button
+                type="button"
                 onClick={handleItalicAll}
-                className={`px-4 py-2 rounded-lg ${
+                title={
+                  narrowHoverHints
+                    ? "Apply italic to all text in the blocks listed for this tab."
+                    : undefined
+                }
+                className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium leading-tight lg:flex-none lg:rounded-lg lg:px-4 lg:py-2 lg:text-base lg:leading-normal ${
                   isItalicAllActive
                     ? "bg-indigo-500 text-white"
                     : "bg-indigo-100 text-indigo-700"
@@ -1286,8 +1355,14 @@ const DocumentPreview = ({
               </button>
 
               <button
+                type="button"
                 onClick={handleUnderlineAll}
-                className={`px-4 py-2 rounded-lg underline ${
+                title={
+                  narrowHoverHints
+                    ? "Apply underline to all text in the blocks listed for this tab."
+                    : undefined
+                }
+                className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium leading-tight underline lg:flex-none lg:rounded-lg lg:px-4 lg:py-2 lg:text-base lg:leading-normal ${
                   isUnderlineAllActive
                     ? "bg-indigo-500 text-white"
                     : "bg-indigo-100 text-indigo-700"
@@ -1329,13 +1404,13 @@ const DocumentPreview = ({
               setSearchText("");
               setEditorNavIndex(0);
             }}
-            className="mb-6"
+            className="mb-4 lg:mb-6"
           />
 
           {/* Blocks */}
           <div className="space-y-5">
             {filteredBlocks.length === 0 ? (
-              <div className="border border-dashed rounded-xl p-10 text-center text-gray-500">
+              <div className="rounded-xl border border-dashed p-6 text-center text-gray-500 sm:p-10">
                 {blocks.length === 0 ? (
                   <>
                     <p className="font-semibold text-lg text-gray-700">Start by uploading a DOCX file</p>

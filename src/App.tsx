@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
@@ -50,6 +51,8 @@ function App() {
   const [originalHtml, setOriginalHtml] = useState("");
 
   const [previewMode, setPreviewMode] = useState(false);
+  const [formattingMenuOpen, setFormattingMenuOpen] =
+    useState(false);
   const [autoFixing, setAutoFixing] = useState(false);
   const [autoFixMessage, setAutoFixMessage] = useState("");
 
@@ -159,6 +162,41 @@ function App() {
     setOriginalHtml(blocksToHtml(blocks));
   }, [blocks]);
 
+  useEffect(() => {
+    if (!formattingMenuOpen) {
+      return;
+    }
+
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const closeIfDesktop = () => {
+      if (mq.matches) {
+        setFormattingMenuOpen(false);
+      }
+    };
+
+    closeIfDesktop();
+    mq.addEventListener("change", closeIfDesktop);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setFormattingMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      mq.removeEventListener("change", closeIfDesktop);
+      document.removeEventListener(
+        "keydown",
+        onKeyDown
+      );
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [formattingMenuOpen]);
+
   return (
     <div className="h-screen flex flex-col bg-[#f5f6fa] overflow-hidden">
       {/* Navbar */}
@@ -170,7 +208,13 @@ function App() {
           onExport={handleExport}
           onAutoFix={handleAutoFix}
           onUpload={handleFileUpload}
+          onOpenFormatting={() =>
+            setFormattingMenuOpen(true)
+          }
           autoFixing={autoFixing}
+          formattingPanelOpen={
+            formattingMenuOpen
+          }
         />
 
         {autoFixMessage && (
@@ -182,10 +226,9 @@ function App() {
         )}
       </div>
 
-      {/* Main content — fills remaining height, both columns scroll independently */}
-      <div className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0">
-        {/* Left Sidebar */}
-        <div className="col-span-3 h-full overflow-y-auto">
+      {/* lg+: same split as before (3 | 9). Smaller screens: one column + drawer */}
+      <div className="flex-1 grid min-h-0 grid-cols-1 gap-4 p-4 lg:grid-cols-12 lg:gap-6 lg:p-6">
+        <div className="hidden h-full min-h-0 overflow-y-auto lg:col-span-3 lg:block">
           <LeftSidebar
             blocks={blocks}
             styles={styles}
@@ -193,8 +236,7 @@ function App() {
           />
         </div>
 
-        {/* Main Editor / Preview */}
-        <div className="col-span-9 h-full overflow-y-auto">
+        <div className="h-full min-h-0 overflow-y-auto lg:col-span-9">
           <DocumentPreview
             blocks={blocks}
             setBlocks={setBlocks}
@@ -206,6 +248,52 @@ function App() {
           />
         </div>
       </div>
+
+      {formattingMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 flex justify-end lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="formatting-panel-title"
+        >
+          <button
+            type="button"
+            aria-label="Close formatting panel"
+            className="absolute inset-0 bg-black/40"
+            onClick={() =>
+              setFormattingMenuOpen(false)
+            }
+          />
+          <div className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-gray-200 bg-[#f5f6fa] shadow-2xl">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3">
+              <h2
+                id="formatting-panel-title"
+                className="text-lg font-semibold text-gray-900"
+              >
+                Formatting Rules
+              </h2>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormattingMenuOpen(false)
+                }
+                className="rounded-lg p-2 text-indigo-600 hover:bg-indigo-50"
+                aria-label="Close formatting panel"
+              >
+                <X size={22} aria-hidden />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              <LeftSidebar
+                blocks={blocks}
+                styles={styles}
+                setStyles={setStyles}
+                embeddedInMenu
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
