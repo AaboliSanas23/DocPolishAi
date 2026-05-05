@@ -11,12 +11,32 @@
 # production
 /build
 
-# misc
-.DS_Store
+# env & secrets (never commit real keys)
+.env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+aabolisanasKey
+aabolisanasKey.pub
+
+# misc
+.DS_Store
+Thumbs.db
+
+# MS Word — sample uploads / working copies (keep local only)
+*.doc
+*.docx
+*.docm
+
+# MS Word lock files while a document is open
+~$*.docx
 
 npm-debug.log*
 yarn-debug.log*

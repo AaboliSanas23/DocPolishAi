@@ -1,4 +1,4 @@
-import { Upload, Wand2, Eye, Download } from "lucide-react";
+import { Upload, Eye, Download } from "lucide-react";
 
 interface Props {
   onPreview: () => void;
@@ -7,6 +7,7 @@ interface Props {
   onUpload: (file: File) => void;
   previewMode: boolean;
   hasDocument: boolean;
+  autoFixing?: boolean;
 }
 
 const Navbar = ({
@@ -16,6 +17,7 @@ const Navbar = ({
   onUpload,
   previewMode,
   hasDocument,
+  autoFixing = false,
 }: Props) => {
   return (
     <div className="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
@@ -43,13 +45,14 @@ const Navbar = ({
         {hasDocument && (
           <>
             {/* Auto Fix */}
-            <button
+            {/* <button
               onClick={onAutoFix}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg flex gap-2 items-center"
+              disabled={autoFixing}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg flex gap-2 items-center disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Wand2 size={18} />
-              Auto Fix
-            </button>
+              {autoFixing ? "Auto Fixing..." : "Auto Fix"}
+            </button> */}
 
             {/* Preview */}
             <button

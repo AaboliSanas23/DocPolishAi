@@ -1,13 +1,29 @@
 import mammoth from "mammoth";
+import {
+  applyColoredRunsToHtml,
+  extractDocxColoredRuns,
+} from "./extractDocxColors";
+import { normalizeWordListsInHtml } from "./normalizeWordLists";
 
 export const extractDocumentHtml = async (
   file: File
 ): Promise<string> => {
   const arrayBuffer = await file.arrayBuffer();
 
-  const result = await mammoth.convertToHtml({
-    arrayBuffer,
-  });
+  // Run mammoth and color extraction in parallel.
+  const [mammothResult, coloredRuns] = await Promise.all([
+    mammoth.convertToHtml({ arrayBuffer }),
+    extractDocxColoredRuns(arrayBuffer),
+  ]);
 
-  return result.value;
+  let html = mammothResult.value;
+
+  if (coloredRuns.length) {
+    html = applyColoredRunsToHtml(
+      html,
+      coloredRuns
+    );
+  }
+
+  return normalizeWordListsInHtml(html);
 };

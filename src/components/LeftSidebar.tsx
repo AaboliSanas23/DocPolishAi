@@ -1,9 +1,12 @@
 import { useMemo } from "react";
 import {
+  CODE_BACKGROUND_PRESETS,
   DEFAULT_STYLE_CONFIG,
+  HighlightMode,
   StyleConfig,
 } from "../types/style";
 import { DocumentBlock } from "../types/document";
+import { wordStyleLabel } from "../utils/wordStyleLabels";
 
 interface Props {
   blocks: DocumentBlock[];
@@ -52,7 +55,9 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600">Title Size</label>
+            <label className="text-sm text-gray-600">
+              Title Size (pt)
+            </label>
             <input
               type="number"
               value={styles.titleSize}
@@ -67,7 +72,9 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Subtitle Size</label>
+            <label className="text-sm text-gray-600">
+              Subtitle Size (pt)
+            </label>
             <input
               type="number"
               value={styles.subtitleSize}
@@ -82,67 +89,15 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
           </div>
 
           <div>
-            <label className="text-sm text-gray-600">Paragraph Size</label>
+            <label className="text-sm text-gray-600">
+              Paragraph Size (pt)
+            </label>
             <input
               type="number"
               value={styles.paragraphSize}
               onChange={(e) =>
                 updateStyle(
                   "paragraphSize",
-                  Number(e.target.value)
-                )
-              }
-              className="w-full border rounded-lg px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">Title Line Height</label>
-            <input
-              type="number"
-              step="0.1"
-              min="1"
-              max="3"
-              value={styles.titleLineHeight}
-              onChange={(e) =>
-                updateStyle(
-                  "titleLineHeight",
-                  Number(e.target.value)
-                )
-              }
-              className="w-full border rounded-lg px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">Subtitle Line Height</label>
-            <input
-              type="number"
-              step="0.1"
-              min="1"
-              max="3"
-              value={styles.subtitleLineHeight}
-              onChange={(e) =>
-                updateStyle(
-                  "subtitleLineHeight",
-                  Number(e.target.value)
-                )
-              }
-              className="w-full border rounded-lg px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">Paragraph Line Height</label>
-            <input
-              type="number"
-              step="0.1"
-              min="1"
-              max="3"
-              value={styles.paragraphLineHeight}
-              onChange={(e) =>
-                updateStyle(
-                  "paragraphLineHeight",
                   Number(e.target.value)
                 )
               }
@@ -201,6 +156,261 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
               <option value="dot">Dot</option>
               <option value="dash">Dash</option>
             </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Dot or dash markers for unordered lists in preview,
+              export, and beside list rows in the editor (when Word
+              lists were detected).
+            </p>
+          </div>
+
+          {/* Code section detection toggle */}
+          <div>
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <span className="text-sm text-gray-600">
+                Detect Code Sections
+              </span>
+
+              <span
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors ${
+                  styles.detectCodeBlocks
+                    ? "bg-indigo-500"
+                    : "bg-gray-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={styles.detectCodeBlocks}
+                  onChange={(e) =>
+                    updateStyle(
+                      "detectCodeBlocks",
+                      e.target.checked
+                    )
+                  }
+                  className="sr-only"
+                />
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform mt-0.5 ${
+                    styles.detectCodeBlocks
+                      ? "translate-x-5"
+                      : "translate-x-0.5"
+                  }`}
+                />
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1">
+              Off = treat code lines as plain paragraphs.
+            </p>
+          </div>
+
+          {/* Code background color */}
+          {styles.detectCodeBlocks && (
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">
+                Code Background
+              </label>
+
+              <div className="grid grid-cols-7 gap-1.5 mb-2">
+                {CODE_BACKGROUND_PRESETS.map(
+                  (preset) => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      title={preset.label}
+                      onClick={() =>
+                        updateStyle(
+                          "codeBackground",
+                          preset.value
+                        )
+                      }
+                      className={`h-8 w-full rounded-md border-2 transition ${
+                        styles.codeBackground ===
+                        preset.value
+                          ? "border-indigo-500 ring-2 ring-indigo-200"
+                          : "border-gray-200 hover:border-gray-400"
+                      }`}
+                      style={{
+                        background: preset.value,
+                      }}
+                    />
+                  )
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={styles.codeBackground}
+                  onChange={(e) =>
+                    updateStyle(
+                      "codeBackground",
+                      e.target.value
+                    )
+                  }
+                  className="h-9 w-11 rounded border cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={styles.codeBackground}
+                  onChange={(e) =>
+                    updateStyle(
+                      "codeBackground",
+                      e.target.value
+                    )
+                  }
+                  className="flex-1 border rounded-lg px-3 py-2 text-sm font-mono"
+                  placeholder="#f8fafc"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Highlight toggle */}
+          <div>
+            <label className="text-sm text-gray-600 block mb-2">
+              Original Highlights
+            </label>
+
+            <div className="flex gap-3">
+              {(
+                [
+                  { value: "keep", label: "Keep" },
+                  { value: "remove", label: "Remove" },
+                ] as { value: HighlightMode; label: string }[]
+              ).map(({ value, label }) => (
+                <label
+                  key={value}
+                  className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border text-sm flex-1 justify-center ${
+                    styles.highlightMode === value
+                      ? "bg-indigo-50 border-indigo-400 text-indigo-700 font-medium"
+                      : "bg-white border-gray-200 text-gray-600"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="highlightMode"
+                    value={value}
+                    checked={styles.highlightMode === value}
+                    onChange={() =>
+                      updateStyle("highlightMode", value)
+                    }
+                    className="accent-indigo-600"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Keep: Word text colours and highlights as in the
+              document. Remove: strip them everywhere (including
+              inside code); code and output still use your Code
+              Background. Switching to Remove applies to this copy
+              only — upload the DOCX again if you want to reload the
+              original colours from Word. Use &quot;Preserve Word
+              highlights &amp; inline body styling&quot; below for a
+              single switch that also resets body typography.
+            </p>
+          </div>
+
+          <div>
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <span className="text-sm text-gray-600">
+                Preserve Word highlights &amp; inline body styling
+              </span>
+              <span
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors ${
+                  styles.highlightMode ===
+                    "keep" &&
+                  !styles.applyBodyFontFromSettings
+                    ? "bg-indigo-500"
+                    : "bg-gray-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={
+                    styles.highlightMode ===
+                      "keep" &&
+                    !styles.applyBodyFontFromSettings
+                  }
+                  onChange={(e) => {
+                    const preserve =
+                      e.target.checked;
+
+                    setStyles(
+                      (
+                        prev
+                      ) => ({
+                        ...prev,
+                        highlightMode:
+                          preserve
+                            ? "keep"
+                            : "remove",
+                        applyBodyFontFromSettings:
+                          !preserve,
+                      })
+                    );
+                  }}
+                  className="sr-only"
+                />
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform mt-0.5 ${
+                    styles.highlightMode ===
+                      "keep" &&
+                    !styles.applyBodyFontFromSettings
+                      ? "translate-x-5"
+                      : "translate-x-0.5"
+                  }`}
+                />
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1">
+              On (default): keeps Word highlight colours on body text,
+              preserves inline bold/italic/underline inside paragraphs,
+              and keeps imported tables; sidebar title/subtitle rules
+              and spacing still apply. Off: sets Original Highlights to
+              Remove, applies sidebar Paragraph Size and font to body,
+              and clears Word bold on body — upload the DOCX again to
+              reload original colours and emphasis.
+            </p>
+          </div>
+
+          <div>
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <span className="text-sm text-gray-600">
+                Promote heading-like opening lines
+              </span>
+              <span
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors ${
+                  styles.promoteOutlineHeadings
+                    ? "bg-indigo-500"
+                    : "bg-gray-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={styles.promoteOutlineHeadings}
+                  onChange={(e) =>
+                    updateStyle(
+                      "promoteOutlineHeadings",
+                      e.target.checked
+                    )
+                  }
+                  className="sr-only"
+                />
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform mt-0.5 ${
+                    styles.promoteOutlineHeadings
+                      ? "translate-x-5"
+                      : "translate-x-0.5"
+                  }`}
+                />
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1">
+              Off: first lines keep Word styling. On (default): short
+              title-like paragraphs use your Title/Subtitle sizes in
+              preview.
+            </p>
           </div>
 
           <button
@@ -237,19 +447,19 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
           {stats.total}
         </p>
         <p>
-          Titles:
+          {wordStyleLabel("title")}:
           {stats.titles}
         </p>
         <p>
-          Subtitles:
+          {wordStyleLabel("subtitle")}:
           {stats.subtitles}
         </p>
         <p>
-          Paragraphs:
+          {wordStyleLabel("paragraph")}:
           {stats.paragraphs}
         </p>
         <p>
-          Code:
+          {wordStyleLabel("code")}:
           {stats.code}
         </p>
       </div>
@@ -257,16 +467,19 @@ const LeftSidebar = ({ blocks, styles, setStyles }: Props) => {
       <div className="bg-white p-5 rounded-xl shadow-sm">
         <h2 className="font-semibold mb-3">Project Insights</h2>
         <p className="text-sm text-gray-600">
-          Detection Mode: Rules-based
+          Detection Mode: Rules 
         </p>
         <p className="text-sm text-gray-600 mt-1">
-          Structure Preserve: Enabled for tables and highlights
+          Structure Preserve: Word tables stay as tables; heading
+          promotion is opt-in; code styling only when detection is on.
         </p>
         <p className="text-sm text-gray-600 mt-1">
-          Code Styling: Dark background + monospace
+          Code Styling: Monospace font with your Code Background colour
+          (defaults to light; dark presets adjust text automatically).
         </p>
         <p className="text-xs text-gray-500 mt-3">
-          Tip: If any block is misclassified, switch its type from the editor dropdown.
+          Tip: If a block is misclassified, change its Word style in the
+          editor (Title, Paragraph, etc.).
         </p>
       </div>
     </div>

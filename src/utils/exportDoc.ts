@@ -10,7 +10,8 @@ export const exportDocument = async (
   try {
     const styledHtml = applyStylesToHtml(
       originalHtml,
-      styles
+      styles,
+      { wrapPresForWord: true }
     );
 
     const fullHtml = `

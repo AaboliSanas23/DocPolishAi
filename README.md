@@ -1,48 +1,68 @@
-# DocPolishAi
+# DocPolishAI
 
-# Getting Started with Create React App
+React app that uploads Word documents (`.docx`), extracts structured blocks for editing, applies consistent typography from the sidebar, and exports back to Word. Optional **Auto Fix** uses a local Ollama endpoint when configured.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Prerequisites
 
-## Available Scripts
+- **Node.js** 18+ (LTS recommended)
+- **npm** 9+
 
-In the project directory, you can run:
+## Setup
 
-### `npm start`
+```bash
+git clone <your-repo-url>
+cd docpolishai
+npm install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Copy environment defaults if you use Auto Fix:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+cp .env.example .env
+```
 
-### `npm test`
+Edit `.env` if your Ollama URL or model differs.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Scripts
 
-### `npm run build`
+| Command        | Description                                      |
+|----------------|--------------------------------------------------|
+| `npm start`    | Development server at http://localhost:3000      |
+| `npm test`     | Jest test suite (`CI=true npm test` for CI)      |
+| `npm run build`| Optimized production bundle in `build/`          |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Publishing to GitHub
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Create an empty repository on GitHub (no README/license if you already have them locally).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. From this project folder:
 
-### `npm run eject`
+   ```bash
+   git remote add origin https://github.com/<your-user>/<your-repo>.git
+   git branch -M main
+   git add .
+   git commit -m "Initial commit"
+   git push -u origin main
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. **Security:** Do **not** commit SSH private keys, `.env` files with secrets, or API keys. This repo’s `.gitignore` excludes common patterns; move personal keys (e.g. `aabolisanasKey`) **outside** the project or rely on `.gitignore`. If you ever pushed a secret by mistake, rotate it and use [GitHub guidance on removing sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Environment variables
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Defined in `.env.example`:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+| Variable                  | Purpose                                      |
+|---------------------------|----------------------------------------------|
+| `REACT_APP_OLLAMA_URL`    | Ollama generate API URL                      |
+| `REACT_APP_OLLAMA_MODEL`  | Model name for Auto Fix                      |
+
+CRA only exposes variables prefixed with `REACT_APP_`.
+
+## Stack
+
+Create React App (TypeScript), Tailwind-style utility classes, Mammoth (DOCX→HTML), export via html-docx-js / docx. Tests use React Testing Library.
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React documentation](https://react.dev/)
