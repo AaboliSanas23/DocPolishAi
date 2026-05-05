@@ -7,8 +7,10 @@ import {
 import {
   Download,
   Eye,
+  Home,
   SlidersHorizontal,
   Upload,
+  X,
 } from "lucide-react";
 
 interface Props {
@@ -17,6 +19,8 @@ interface Props {
   onAutoFix: () => void;
   onUpload: (file: File) => void;
   onOpenFormatting: () => void;
+  /** Clear document and exit preview / close formatting drawer. */
+  onResetWorkspace: () => void;
   previewMode: boolean;
   hasDocument: boolean;
   autoFixing?: boolean;
@@ -30,6 +34,7 @@ const Navbar = ({
   onAutoFix,
   onUpload,
   onOpenFormatting,
+  onResetWorkspace,
   previewMode,
   hasDocument,
   autoFixing = false,
@@ -110,9 +115,28 @@ const Navbar = ({
 
   return (
     <div className="flex items-center justify-between gap-2 border-b bg-white px-3 py-2.5 shadow-sm sm:px-6 sm:py-4">
-      <h1 className="shrink-0 text-lg font-bold tracking-tight text-indigo-600 sm:text-xl lg:text-2xl">
-        DocPolishAI
-      </h1>
+      <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          onClick={onResetWorkspace}
+          aria-label="Home"
+          title="Home"
+          className="flex shrink-0 items-center gap-1 rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-800 shadow-sm hover:bg-gray-50 sm:gap-2 sm:px-3 sm:text-sm"
+        >
+          <Home
+            size={18}
+            className="shrink-0 text-indigo-600"
+            aria-hidden
+          />
+          <span className="hidden sm:inline">
+            Home
+          </span>
+        </button>
+
+        <h1 className="min-w-0 truncate border-l border-gray-200 pl-2 text-lg font-bold tracking-tight text-indigo-600 sm:pl-3 sm:text-xl lg:text-2xl">
+          DocPolishAI
+        </h1>
+      </div>
 
       <div className="flex min-w-0 flex-1 justify-end">
         <div className="flex max-w-full flex-nowrap items-center justify-end gap-1.5 overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch] sm:gap-2 sm:pb-0 lg:max-w-none lg:overflow-visible lg:pb-0">
@@ -187,6 +211,23 @@ const Navbar = ({
 
         {hasDocument && (
           <>
+            <button
+              type="button"
+              onClick={onResetWorkspace}
+              aria-label="Close document"
+              title="Close document"
+              className="flex shrink-0 items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium text-gray-800 hover:bg-gray-50 sm:gap-2 sm:px-4 sm:py-2 sm:text-base"
+            >
+              <X
+                size={16}
+                className="shrink-0 text-gray-700 sm:h-[18px] sm:w-[18px]"
+                aria-hidden
+              />
+              <span className="whitespace-nowrap">
+                Close
+              </span>
+            </button>
+
             {/* Auto Fix */}
             {/* <button
               onClick={onAutoFix}

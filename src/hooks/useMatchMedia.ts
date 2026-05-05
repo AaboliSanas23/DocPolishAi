@@ -10,8 +10,24 @@ export function useMatchMedia(
     useState(false);
 
   useEffect(() => {
-    const mq =
-      window.matchMedia(query);
+    if (
+      typeof window.matchMedia !==
+      "function"
+    ) {
+      return;
+    }
+
+    let mq: MediaQueryList;
+
+    try {
+      mq = window.matchMedia(query);
+    } catch {
+      return;
+    }
+
+    if (!mq) {
+      return;
+    }
 
     const update = () =>
       setMatches(mq.matches);

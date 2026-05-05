@@ -62,6 +62,15 @@ function App() {
     })
   );
 
+  /** Clear loaded document and return to the empty workspace (Home / Close document). */
+  const resetWorkspace = () => {
+    setBlocks([]);
+    setOriginalHtml("");
+    setPreviewMode(false);
+    setAutoFixMessage("");
+    setFormattingMenuOpen(false);
+  };
+
   //------------------------------------------
   // Upload DOCX
   //------------------------------------------
@@ -208,6 +217,7 @@ function App() {
           onExport={handleExport}
           onAutoFix={handleAutoFix}
           onUpload={handleFileUpload}
+          onResetWorkspace={resetWorkspace}
           onOpenFormatting={() =>
             setFormattingMenuOpen(true)
           }
@@ -277,9 +287,12 @@ function App() {
                 onClick={() =>
                   setFormattingMenuOpen(false)
                 }
-                className="rounded-lg p-2 text-indigo-600 hover:bg-indigo-50"
+                className="flex items-center gap-1.5 rounded-lg px-2 py-2 text-indigo-600 hover:bg-indigo-50"
                 aria-label="Close formatting panel"
               >
+                <span className="hidden text-sm font-medium text-gray-800 sm:inline">
+                  Close
+                </span>
                 <X size={22} aria-hidden />
               </button>
             </div>
