@@ -2,7 +2,7 @@ import {
   applyJoinedLinesToBodyBlocks,
   tryParseOutputTailAfterCode,
 } from "./outputSectionBlocks";
-import { DocumentBlock } from "../types/document";
+import { DocumentBlock } from "../../types/document";
 
 const mockBlocks = (
   parts: Partial<DocumentBlock>[]

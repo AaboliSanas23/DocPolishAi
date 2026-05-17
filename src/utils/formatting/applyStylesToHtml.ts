@@ -4,9 +4,9 @@ import {
   isDocSectionHeadingLine,
   isLikelyCodeBridgeLine,
   isSoftCodeContinuationLine,
-} from "./codeDetection";
-import { isLikelyHeadingCandidate } from "./detectType";
-import { StyleConfig } from "../types/style";
+} from "../docx/codeDetection";
+import { isLikelyHeadingCandidate } from "../docx/detectType";
+import { StyleConfig } from "../../types/style";
 
 /** Remove inline font-size on descendants so parent heading / title rules win (Word runs). */
 const stripFontSizeFromStyledSubtree = (

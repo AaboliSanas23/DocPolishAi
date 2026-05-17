@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  memo,
 } from "react";
 import {
   Download,
@@ -288,4 +289,4 @@ const Navbar = ({
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

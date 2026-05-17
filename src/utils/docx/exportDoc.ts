@@ -1,7 +1,7 @@
 import htmlDocx from "html-docx-js/dist/html-docx";
 import { saveAs } from "file-saver";
-import { StyleConfig } from "../types/style";
-import { applyStylesToHtml } from "./applyStylesToHtml";
+import { StyleConfig } from "../../types/style";
+import { applyStylesToHtml } from "../formatting/applyStylesToHtml";
 
 export const exportDocument = async (
   originalHtml: string,

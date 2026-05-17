@@ -2,6 +2,28 @@
 
 React app that uploads Word documents (`.docx`), extracts structured blocks for editing, applies consistent typography from the sidebar, and exports back to Word. Optional **Auto Fix** uses a local Ollama endpoint when configured.
 
+## Project layout
+
+```
+src/
+  app/                 # Root screen: App + smoke test
+  components/
+    layout/            # Navbar
+    editor/            # Document preview, search bar, rich paragraph field
+    sidebar/           # Formatting rules panel
+  hooks/               # Shared hooks (e.g. useMatchMedia)
+  store/               # Redux Toolkit + redux-persist
+  types/               # DocumentBlock, StyleConfig, ambient types
+  utils/
+    docx/              # Ingest, classify blocks, export .docx, Word labels
+    formatting/        # applyStylesToHtml (preview/export styling)
+    editor/            # Rich text, search highlights, code/output sections
+    ai/                # Ollama Auto Fix
+  index.tsx            # Entry: Provider, PersistGate, CSS
+  index.css
+  setupTests.ts
+```
+
 ## Prerequisites
 
 - **Node.js** 18+ (LTS recommended)
@@ -57,6 +79,14 @@ Defined in `.env.example`:
 | `REACT_APP_OLLAMA_MODEL`  | Model name for Auto Fix                      |
 
 CRA only exposes variables prefixed with `REACT_APP_`.
+
+## Documentation (`docs/`)
+
+| Doc | Contents |
+|-----|----------|
+| [PERFORMANCE.md](docs/PERFORMANCE.md) | **Two tracks:** (1) earlier **`src/`** folder layout; (2) typing lag — root cause, debouncing, verification, interview Q&A |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Data flow, Redux, layers |
+| [CODEBASE.md](docs/CODEBASE.md) | File-by-area guide |
 
 ## Stack
 

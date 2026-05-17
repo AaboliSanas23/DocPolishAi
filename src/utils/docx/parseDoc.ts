@@ -1,8 +1,8 @@
-import { BlockType, DocumentBlock } from "../types/document";
+import { BlockType, DocumentBlock } from "../../types/document";
 import {
   elementHasInlineRichMarkup,
   sanitizeRichParagraphHtml,
-} from "./sanitizeRichParagraphHtml";
+} from "../editor/sanitizeRichParagraphHtml";
 
 const WRAPPER_TAGS = new Set([
   "div",

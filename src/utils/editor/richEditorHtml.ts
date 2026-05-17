@@ -1,4 +1,4 @@
-import type { DocumentBlock } from "../types/document";
+import type { DocumentBlock } from "../../types/document";
 import { sanitizeRichParagraphHtml } from "./sanitizeRichParagraphHtml";
 
 const escapeHtmlText = (

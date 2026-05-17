@@ -1,4 +1,4 @@
-import { BlockType } from "../types/document";
+import { BlockType } from "../../types/document";
 
 /**
  * Human-readable labels for editor UI. Internal `BlockType` is unchanged.

@@ -1,5 +1,5 @@
-import { BlockType, DocumentBlock } from "../types/document";
-import { StyleConfig } from "../types/style";
+import { BlockType, DocumentBlock } from "../../types/document";
+import { StyleConfig } from "../../types/style";
 
 type AIType = BlockType | "syntax" | "output";
 

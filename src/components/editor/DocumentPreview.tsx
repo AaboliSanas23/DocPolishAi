@@ -8,22 +8,22 @@ import {
   type CSSProperties,
 } from "react";
 import { Trash2, Upload } from "lucide-react";
-import { BlockType, DocumentBlock } from "../types/document";
-import { StyleConfig } from "../types/style";
-import { applyStylesToHtml } from "../utils/applyStylesToHtml";
+import { BlockType, DocumentBlock } from "../../types/document";
+import { StyleConfig } from "../../types/style";
+import { applyStylesToHtml } from "../../utils/formatting/applyStylesToHtml";
 import {
   countSearchMatchesInHtml,
   highlightSearchInHtml,
   stripDocPolishSearchMarks,
-} from "../utils/highlightSearchInHtml";
-import { extractBlocksFromHtml } from "../utils/parseDoc";
-import { detectBlockTypes } from "../utils/detectType";
+} from "../../utils/editor/highlightSearchInHtml";
+import { extractBlocksFromHtml } from "../../utils/docx/parseDoc";
+import { detectBlockTypes } from "../../utils/docx/detectType";
 import {
   applyJoinedLinesToBodyBlocks,
   tryParseOutputTailAfterCode,
-} from "../utils/outputSectionBlocks";
-import { wordStyleLabel } from "../utils/wordStyleLabels";
-import { useMatchMedia } from "../hooks/useMatchMedia";
+} from "../../utils/editor/outputSectionBlocks";
+import { wordStyleLabel } from "../../utils/docx/wordStyleLabels";
+import { useMatchMedia } from "../../hooks/useMatchMedia";
 import DocumentSearchBar from "./DocumentSearchBar";
 import RichParagraphField, {
   type RichParagraphFieldHandle,
@@ -37,7 +37,7 @@ import {
   blockLooksGloballyBold,
   blockLooksGloballyItalic,
   blockLooksGloballyUnderline,
-} from "../utils/richEditorHtml";
+} from "../../utils/editor/richEditorHtml";
 
 /** Whether a {@link DocumentBlock} belongs to the editor’s active style tab. */
 type EditorTab = BlockType | "all";
@@ -84,6 +84,32 @@ const blockMatchesEditorTab = (
 
   return block.type === tab;
 };
+
+function InlineDocxUploadButton({
+  onUpload,
+}: {
+  onUpload: (file: File) => void;
+}) {
+  return (
+    <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700">
+      <Upload size={16} />
+      Upload DOCX
+      <input
+        type="file"
+        accept=".docx"
+        className="hidden"
+        onChange={(e) => {
+          const file =
+            e.target.files?.[0];
+
+          if (file) {
+            onUpload(file);
+          }
+        }}
+      />
+    </label>
+  );
+}
 
 /** Rich editor: inherit size/font only — bold/italic/underline come from inner HTML. */
 const richEditorOuterStyle = (
@@ -283,29 +309,6 @@ const DocumentPreview = ({
       setActiveTab("paragraph");
     }
   }, [activeTab]);
-
-  const handleInlineUpload = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      onUpload(file);
-    }
-  };
-
-  const InlineUploadButton = () => (
-    <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700">
-      <Upload size={16} />
-      Upload DOCX
-      <input
-        type="file"
-        accept=".docx"
-        className="hidden"
-        onChange={handleInlineUpload}
-      />
-    </label>
-  );
 
   //-----------------------------------
   // If user has turned off code detection,
@@ -694,8 +697,10 @@ const DocumentPreview = ({
   //-----------------------------------
   // Filter blocks
   //-----------------------------------
-  const filteredBlocks = displayBlocks.filter(
-    (block) => {
+  const filteredBlocks = useMemo(() => {
+    const q = searchText.trim().toLowerCase();
+
+    return displayBlocks.filter((block) => {
       if (
         hiddenOutputParagraphIds.has(
           block.id
@@ -713,8 +718,6 @@ const DocumentPreview = ({
         return false;
       }
 
-      const q = searchText.trim().toLowerCase();
-
       if (!q) {
         return true;
       }
@@ -728,8 +731,13 @@ const DocumentPreview = ({
             .toLowerCase()
             .includes(q))
       );
-    },
-  );
+    });
+  }, [
+    displayBlocks,
+    hiddenOutputParagraphIds,
+    activeTab,
+    searchText,
+  ]);
 
   const styledPreviewHtml = useMemo(() => {
     if (!originalHtml.trim()) {
@@ -789,6 +797,14 @@ const DocumentPreview = ({
       return;
     }
 
+    // Parent cleared the workspace (Home / Close) — never re-import preview DOM into blocks.
+    if (blocks.length === 0) {
+      lastPreviewInnerHtmlRef.current = "";
+      previewDirtyRef.current = false;
+      setPreviewEditing(false);
+      return;
+    }
+
     const snap =
       lastPreviewInnerHtmlRef.current;
 
@@ -802,7 +818,11 @@ const DocumentPreview = ({
     lastPreviewInnerHtmlRef.current = "";
     previewDirtyRef.current = false;
     setPreviewEditing(false);
-  }, [previewMode, persistPreviewEdits]);
+  }, [
+    previewMode,
+    persistPreviewEdits,
+    blocks.length,
+  ]);
 
   const filteredBlockSignature = useMemo(
     () =>
@@ -1239,7 +1259,7 @@ const DocumentPreview = ({
                 <div>
                   <p className="font-semibold text-lg text-gray-700">No document loaded</p>
                   <p className="mt-1">Upload a DOCX file to preview formatted output.</p>
-                  <InlineUploadButton />
+                  <InlineDocxUploadButton onUpload={onUpload} />
                 </div>
               </div>
             )}
@@ -1415,7 +1435,7 @@ const DocumentPreview = ({
                   <>
                     <p className="font-semibold text-lg text-gray-700">Start by uploading a DOCX file</p>
                     <p className="mt-1">Use any upload button to load your document.</p>
-                    <InlineUploadButton />
+                    <InlineDocxUploadButton onUpload={onUpload} />
                   </>
                 ) : (
                   <>
@@ -1454,7 +1474,7 @@ const DocumentPreview = ({
                             e.target.value as BlockType
                           )
                     }
-                    className="border rounded-lg px-3 py-2"
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:outline-none"
                   >
                         <option value="title">
                           {wordStyleLabel("title")}

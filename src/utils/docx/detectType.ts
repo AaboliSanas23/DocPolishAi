@@ -1,4 +1,4 @@
-import { BlockType, DocumentBlock } from "../types/document";
+import { BlockType, DocumentBlock } from "../../types/document";
 import {
   countUnescapedBackticks,
   isCodeLikeLine,

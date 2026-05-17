@@ -30,6 +30,9 @@ aabolisanasKey.pub
 .DS_Store
 Thumbs.db
 
+# Local-only docs (architecture / interview notes — not pushed)
+/docs/
+
 # MS Word — sample uploads / working copies (keep local only)
 *.doc
 *.docx

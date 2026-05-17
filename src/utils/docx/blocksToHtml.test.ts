@@ -1,4 +1,4 @@
-import { DocumentBlock } from "../types/document";
+import { DocumentBlock } from "../../types/document";
 import { blocksToHtml } from "./blocksToHtml";
 import { extractBlocksFromHtml } from "./parseDoc";
 import { detectBlockTypes } from "./detectType";

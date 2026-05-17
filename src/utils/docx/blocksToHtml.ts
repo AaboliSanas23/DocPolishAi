@@ -1,7 +1,7 @@
 import {
   DocumentBlock,
   BlockType,
-} from "../types/document";
+} from "../../types/document";
 
 const escapeHtml = (text: string): string =>
   text

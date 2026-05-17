@@ -1,12 +1,12 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   CODE_BACKGROUND_PRESETS,
   DEFAULT_STYLE_CONFIG,
   HighlightMode,
   StyleConfig,
-} from "../types/style";
-import { DocumentBlock } from "../types/document";
-import { wordStyleLabel } from "../utils/wordStyleLabels";
+} from "../../types/style";
+import { DocumentBlock } from "../../types/document";
+import { wordStyleLabel } from "../../utils/docx/wordStyleLabels";
 
 interface Props {
   blocks: DocumentBlock[];
@@ -145,7 +145,7 @@ const LeftSidebar = ({
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:outline-none"
             >
               <option>Calibri</option>
               <option>Times New Roman</option>
@@ -164,7 +164,7 @@ const LeftSidebar = ({
                   e.target.value as "dot" | "dash"
                 )
               }
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:outline-none"
             >
               <option value="dot">Dot</option>
               <option value="dash">Dash</option>
@@ -239,7 +239,7 @@ const LeftSidebar = ({
                         styles.codeBackground ===
                         preset.value
                           ? "border-indigo-500 ring-2 ring-indigo-200"
-                          : "border-gray-200 hover:border-gray-400"
+                          : "border-gray-200"
                       }`}
                       style={{
                         background: preset.value,
@@ -499,4 +499,4 @@ const LeftSidebar = ({
   );
 };
 
-export default LeftSidebar;
+export default memo(LeftSidebar);

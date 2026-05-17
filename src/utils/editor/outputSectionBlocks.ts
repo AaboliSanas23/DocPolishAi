@@ -1,5 +1,5 @@
-import { DocumentBlock } from "../types/document";
-import { isCodeLikeLine } from "./codeDetection";
+import { DocumentBlock } from "../../types/document";
+import { isCodeLikeLine } from "../docx/codeDetection";
 
 /**
  * Paragraph sequence after a code block that Preview treats as “Output” +

@@ -47,7 +47,7 @@ const DocumentSearchBar = ({
       className={`flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2 ${className}`}
     >
       <div
-        className="relative flex min-h-0 min-w-0 w-full items-center rounded-lg border border-slate-300 bg-white shadow-sm focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-200 lg:flex-[1_1_240px] lg:rounded-xl"
+        className="relative flex min-h-0 min-w-0 w-full items-center rounded-lg border border-slate-300 bg-white shadow-sm lg:flex-[1_1_240px] lg:rounded-xl"
       >
         <Search
           className="pointer-events-none absolute left-2.5 h-4 w-4 shrink-0 text-slate-400 lg:left-3"
